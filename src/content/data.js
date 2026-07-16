@@ -5,6 +5,10 @@ import { drugs as cns } from './drugs_cns';
 import { drugs as derma } from './drugs_derma';
 import { drugs as urology } from './drugs_urology';
 import { drugs as hematology } from './drugs_hematology';
+import { drugs as gi } from './drugs_gi';
+import { drugs as endocrine } from './drugs_endocrine';
+import { drugs as womensHealth } from './drugs_womens_health';
+import { drugs as ophthalmology } from './drugs_ophthalmology';
 
 import { diseases as importedDiseases } from './diseasesData';
 import { diseases as extraDiseases } from './diseases_extra';
@@ -31,7 +35,19 @@ export const SPECIALTIES = [
   { id: 'oncology_basic', name: 'Oncology Basics (Common Drugs)',   nameAr: 'أساسيات الأورام (الأدوية الشائعة)', color: '#7C3AED', icon: '🎗️' }
 ];
 
-export const drugs = [...importedDrugs, ...antibiotics, ...respiratory, ...cns, ...derma, ...urology, ...hematology];
+export const drugs = [
+  ...importedDrugs, 
+  ...antibiotics, 
+  ...respiratory, 
+  ...cns, 
+  ...derma, 
+  ...urology, 
+  ...hematology,
+  ...gi,
+  ...endocrine,
+  ...womensHealth,
+  ...ophthalmology
+];
 export const diseases = [...importedDiseases, ...extraDiseases];
 export const quickFacts = importedQuickFacts;
 
