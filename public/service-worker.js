@@ -1,22 +1,13 @@
 // Service Worker for RxRefresh PWA
 // Handles background notifications, sync, and offline functionality
 
+// Workbox manifest injection point
+self.__WB_MANIFEST;
+
 const CACHE_NAME = 'rxrefresh-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-];
 
 // Install event - cache resources
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache).catch(() => {
-        console.log('Cache add failed, some resources might not be available offline');
-      });
-    })
-  );
   self.skipWaiting();
 });
 
@@ -123,13 +114,8 @@ self.addEventListener('notificationclick', (event) => {
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-notifications') {
     event.waitUntil(
-      // Check stored notification time and show notification if needed
       (async () => {
         try {
-          const cache = await caches.open(CACHE_NAME);
-          const response = await cache.match('/');
-          
-          // Get notification settings from IndexedDB or localStorage alternative
           const settings = await getNotificationSettings();
           
           if (shouldNotify(settings)) {
@@ -151,10 +137,9 @@ self.addEventListener('sync', (event) => {
 
 // Helper function to get notification settings
 async function getNotificationSettings() {
-  // This would be populated by the app
   return {
     notificationTime: '21:00',
-    lastNotified: localStorage?.getItem?.('rxrefresh_last_notified') || null
+    lastNotified: null
   };
 }
 
@@ -165,14 +150,12 @@ function shouldNotify(settings) {
   const now = new Date();
   const today = now.toDateString();
   
-  // Already notified today
   if (settings.lastNotified === today) return false;
   
   const [targetHour, targetMinute] = settings.notificationTime.split(':').map(Number);
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
   
-  // Check if we're within notification window (±2 minutes for tolerance)
   return currentHour === targetHour && 
          Math.abs(currentMinute - targetMinute) <= 2;
 }
