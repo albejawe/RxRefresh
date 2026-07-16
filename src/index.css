@@ -29,27 +29,27 @@
 }
 
 .light {
-  --bg-primary-rgb: 243 244 246;
-  --bg-secondary-rgb: 229 231 235;
+  --bg-primary-rgb: 248 249 253; /* Soft cream/lavender white */
+  --bg-secondary-rgb: 240 242 249;
   --bg-card-rgb: 255 255 255;
-  --bg-elevated-rgb: 249 250 251;
+  --bg-elevated-rgb: 244 246 252;
 
-  --bg-primary: #F3F4F6; /* Cool light gray */
-  --bg-secondary: #E5E7EB;
+  --bg-primary: #F8F9FD;
+  --bg-secondary: #F0F2F9;
   --bg-card: #FFFFFF;
-  --bg-elevated: #F9FAFB;
+  --bg-elevated: #F4F6FC;
   
-  --text-primary: #111827; /* Near black */
-  --text-secondary: #4B5563; /* Dark gray */
-  --text-muted: #9CA3AF;
+  --text-primary: #1E1B4B; /* Deep Indigo 950 - highly readable and premium */
+  --text-secondary: #4F46E5; /* Indigo 600 - distinct secondary color */
+  --text-muted: #818CF8; /* Indigo 400 - muted details */
   
-  --border-color: rgba(0, 0, 0, 0.06);
-  --border-strong: rgba(0, 0, 0, 0.12);
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-bg-elevated: rgba(255, 255, 255, 0.9);
-  --glass-premium-bg: rgba(255, 255, 255, 0.65);
-  --glass-premium-shadow: rgba(31, 38, 135, 0.05);
-  --glass-inset-shadow: rgba(255, 255, 255, 0.5);
+  --border-color: rgba(99, 102, 241, 0.08); /* Subtle indigo tint border */
+  --border-strong: rgba(99, 102, 241, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.92);
+  --glass-premium-bg: rgba(255, 255, 255, 0.75);
+  --glass-premium-shadow: rgba(79, 70, 229, 0.06); /* Premium soft purple shadow */
+  --glass-inset-shadow: rgba(255, 255, 255, 0.9);
 }
 
 @layer base {
