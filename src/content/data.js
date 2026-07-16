@@ -14,11 +14,13 @@ import { drugs as msk } from './drugs_msk';
 import { drugs as allergy } from './drugs_allergy';
 import { drugs as extraDrugs1 } from './drugs_extra1';
 import { drugs as extraDrugs2 } from './drugs_extra2';
+import { drugs as extraDrugs3 } from './drugs_extra3';
 
 import { diseases as importedDiseases } from './diseasesData';
 import { diseases as extraDiseases } from './diseases_extra';
 import { diseases as extraDiseases2 } from './diseases_extra2';
 import { diseases as extraDiseases3 } from './diseases_extra3';
+import { diseases as extraDiseases4 } from './diseases_extra4';
 import { quickFacts as importedQuickFacts } from './quickFactsData';
 
 export const SPECIALTIES = [
@@ -58,9 +60,10 @@ export const drugs = [
   ...msk,
   ...allergy,
   ...extraDrugs1,
-  ...extraDrugs2
+  ...extraDrugs2,
+  ...extraDrugs3
 ];
-export const diseases = [...importedDiseases, ...extraDiseases, ...extraDiseases2, ...extraDiseases3];
+export const diseases = [...importedDiseases, ...extraDiseases, ...extraDiseases2, ...extraDiseases3, ...extraDiseases4];
 export const quickFacts = importedQuickFacts;
 
 export const getSpecialtyById = (id) => SPECIALTIES.find(s => s.id === id);
