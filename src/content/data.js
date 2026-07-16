@@ -38,6 +38,9 @@ import { drugs as extraDrugs23, diseases as extraDiseases24 } from './drugs_extr
 import { drugs as extraDrugs24, diseases as extraDiseases25 } from './drugs_extra24';
 import { drugs as extraDrugs25, diseases as extraDiseases26 } from './drugs_extra25';
 import { drugs as extraDrugs26, diseases as extraDiseases27 } from './drugs_extra26';
+import { drugs as extraDrugs27, diseases as extraDiseases28 } from './drugs_extra27';
+import { drugs as extraDrugs28, diseases as extraDiseases29 } from './drugs_extra28';
+import { drugs as extraDrugs29, diseases as extraDiseases30 } from './drugs_extra29';
 
 import { diseases as importedDiseases } from './diseasesData';
 import { diseases as extraDiseases } from './diseases_extra';
@@ -111,9 +114,12 @@ export const drugs = [
   ...extraDrugs23,
   ...extraDrugs24,
   ...extraDrugs25,
-  ...extraDrugs26
+  ...extraDrugs26,
+  ...extraDrugs27,
+  ...extraDrugs28,
+  ...extraDrugs29
 ];
-export const diseases = [...importedDiseases, ...extraDiseases, ...extraDiseases2, ...extraDiseases3, ...extraDiseases4, ...extraDiseases5, ...extraDiseases6, ...extraDiseases7, ...extraDiseases8, ...extraDiseases9, ...extraDiseases10, ...extraDiseases11, ...extraDiseases12, ...extraDiseases13, ...extraDiseases14, ...extraDiseases15, ...extraDiseases16, ...extraDiseases17, ...extraDiseases18, ...extraDiseases19, ...extraDiseases20, ...extraDiseases21, ...extraDiseases22, ...extraDiseases23, ...extraDiseases24, ...extraDiseases25, ...extraDiseases26, ...extraDiseases27];
+export const diseases = [...importedDiseases, ...extraDiseases, ...extraDiseases2, ...extraDiseases3, ...extraDiseases4, ...extraDiseases5, ...extraDiseases6, ...extraDiseases7, ...extraDiseases8, ...extraDiseases9, ...extraDiseases10, ...extraDiseases11, ...extraDiseases12, ...extraDiseases13, ...extraDiseases14, ...extraDiseases15, ...extraDiseases16, ...extraDiseases17, ...extraDiseases18, ...extraDiseases19, ...extraDiseases20, ...extraDiseases21, ...extraDiseases22, ...extraDiseases23, ...extraDiseases24, ...extraDiseases25, ...extraDiseases26, ...extraDiseases27, ...extraDiseases28, ...extraDiseases29, ...extraDiseases30];
 export const quickFacts = importedQuickFacts;
 
 export const getSpecialtyById = (id) => SPECIALTIES.find(s => s.id === id);
