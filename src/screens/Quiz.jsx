@@ -59,16 +59,16 @@ export default function Quiz() {
       type: 'ANSWER_CARD',
       payload: { cardId: currentQ.cardId, correct, type: 'quiz' }
     });
+  };
 
-    setTimeout(() => {
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex(c => c + 1);
-        setSelectedAnswer(null);
-        setIsCorrect(null);
-      } else {
-        setIsFinished(true);
-      }
-    }, 2000);
+  const handleNextQuestion = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(c => c + 1);
+      setSelectedAnswer(null);
+      setIsCorrect(null);
+    } else {
+      setIsFinished(true);
+    }
   };
 
   if (isFinished) {
@@ -227,17 +227,27 @@ export default function Quiz() {
           </div>
 
           <AnimatePresence>
-            {selectedAnswer !== null && currentQ.explanation && (
+            {selectedAnswer !== null && (
               <motion.div 
                 initial={{ opacity: 0, height: 0, y: 20 }} 
                 animate={{ opacity: 1, height: 'auto', y: 0 }}
                 exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
+                className="overflow-hidden flex flex-col gap-4 mt-2"
               >
-                <div className={`p-5 rounded-2xl text-sm md:text-base font-bold shadow-glass border relative ${isCorrect ? 'bg-accent-emerald/10 border-accent-emerald/30 text-accent-emerald' : 'bg-accent-red/10 border-accent-red/30 text-accent-red'}`}>
-                  <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: isCorrect ? '#10B981' : '#F43F5E' }} />
-                  {currentQ.explanation}
-                </div>
+                {currentQ.explanation && (
+                  <div className={`p-5 rounded-2xl text-sm md:text-base font-bold shadow-glass border relative ${isCorrect ? 'bg-accent-emerald/10 border-accent-emerald/30 text-accent-emerald' : 'bg-accent-red/10 border-accent-red/30 text-accent-red'}`}>
+                    <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: isCorrect ? '#10B981' : '#F43F5E' }} />
+                    {currentQ.explanation}
+                  </div>
+                )}
+                
+                <button 
+                  onClick={handleNextQuestion}
+                  className="btn-primary w-full py-4 text-base font-bold tracking-wide flex items-center justify-center gap-2"
+                >
+                  <span>{currentIndex === questions.length - 1 ? 'إنهاء الاختبار' : 'السؤال التالي'}</span>
+                  <span className="rotate-180">➔</span>
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
