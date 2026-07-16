@@ -59,28 +59,26 @@ const BottomNavigation = () => {
     { path: '/settings', icon: IconSettings, label: 'إعدادات' },
   ];
 
-  // Hide nav on quiz and card details to maximize focus
   if (location.pathname.startsWith('/quiz') || location.pathname.startsWith('/card')) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-bg-card/90 backdrop-blur-lg border-t border-white/10 pb-safe">
-      <div className="flex justify-around items-center h-16 max-w-lg mx-auto px-2">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm rounded-full glass-premium px-2 py-2 shadow-glass border border-white/10">
+      <div className="flex justify-around items-center relative">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
           return (
-            <Link key={item.path} to={item.path} className="relative flex flex-col items-center justify-center w-full h-full">
+            <Link key={item.path} to={item.path} className="relative flex flex-col items-center justify-center w-14 h-12 rounded-full z-10 transition-colors">
               <Icon
-                size={24}
-                className={`transition-colors duration-200 ${isActive ? 'text-accent-cyan' : 'text-text-muted hover:text-text-secondary'}`}
+                size={22}
+                strokeWidth={isActive ? 2.5 : 2}
+                className={`transition-colors duration-300 relative z-10 ${isActive ? 'text-white drop-shadow-md' : 'text-text-muted hover:text-white/80'}`}
               />
-              <span className={`text-[10px] mt-1 font-semibold ${isActive ? 'text-accent-cyan' : 'text-text-muted'}`}>
-                {item.label}
-              </span>
               {isActive && (
                 <motion.div
                   layoutId="bottomNavIndicator"
-                  className="absolute top-0 w-8 h-1 bg-accent-cyan rounded-b-full"
+                  className="absolute inset-0 bg-gradient-to-r from-accent-indigo to-accent-cyan rounded-full z-0 shadow-glow-cyan"
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 />
               )}
             </Link>
@@ -96,7 +94,7 @@ function App() {
     <AppProvider>
       <ToastProvider>
         <Router>
-          <div className="min-h-screen bg-bg-primary text-text-primary selection:bg-accent-cyan selection:text-bg-primary overflow-x-hidden">
+          <div className="min-h-screen bg-bg-primary text-text-primary selection:bg-accent-cyan selection:text-bg-primary overflow-x-hidden relative">
             <NotificationManager />
             <AnimatedRoutes />
             <BottomNavigation />

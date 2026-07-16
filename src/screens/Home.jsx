@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Flame, Star, ChevronLeft, Play } from 'lucide-react';
+import { Flame, Star, ChevronLeft, Play, Award, Zap, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext';
 import { Card, CardContent } from '../components/ui/Card';
@@ -7,71 +7,126 @@ import { ProgressRing } from '../components/ui/ProgressRing';
 
 export default function Home() {
   const { state } = useAppContext();
-  const { streak, totalPoints } = state.userStats;
+  const { streak, totalPoints, longestStreak } = state.userStats;
+
+  // Stagger animation for children
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  };
 
   return (
-    <div className="flex flex-col gap-6 w-full pb-20">
+    <motion.div 
+      className="flex flex-col gap-8 w-full pb-20 relative"
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+    >
+      {/* Background Ambient Glows */}
+      <div className="fixed top-[-10%] left-[-10%] w-[50vh] h-[50vh] rounded-full bg-accent-indigo/20 blur-[80px] pointer-events-none" />
+      <div className="fixed top-[40%] right-[-10%] w-[40vh] h-[40vh] rounded-full bg-accent-purple/20 blur-[80px] pointer-events-none" />
+      
       {/* Header section */}
-      <header className="flex justify-between items-center py-4">
+      <motion.header variants={itemVariants} className="flex justify-between items-center py-2 relative z-10">
         <div>
-          <h1 className="text-2xl font-bold font-cairo">مرحباً بك! 👋</h1>
-          <p className="text-text-secondary text-sm">مستعد لرحلة اليوم؟</p>
+          <h1 className="text-3xl font-extrabold font-cairo text-white tracking-tight flex items-center gap-2">
+            مرحباً بك! <span className="text-accent-cyan inline-block animate-float">✨</span>
+          </h1>
+          <p className="text-text-secondary mt-1 font-medium text-sm">مستعد لرحلة اليوم العلمية؟</p>
         </div>
         
         <div className="flex gap-3">
-          <div className="flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-            <Flame size={16} className={streak > 0 ? 'text-accent-amber' : 'text-text-muted'} />
-            <span className="font-bold text-sm">{streak}</span>
+          <div className="flex items-center gap-1.5 glass-premium px-4 py-2 rounded-2xl relative overflow-hidden group cursor-default">
+            {/* Inner shimmer on hover */}
+            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors" />
+            <Flame size={18} className={streak > 0 ? 'text-accent-amber drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]' : 'text-text-muted'} />
+            <span className="font-bold text-sm text-white">{streak}</span>
           </div>
-          <div className="flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-            <Star size={16} className="text-accent-amber" />
-            <span className="font-bold text-sm">{totalPoints}</span>
+          <div className="flex items-center gap-1.5 glass-premium px-4 py-2 rounded-2xl relative overflow-hidden group cursor-default">
+            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors" />
+            <Star size={18} className="text-accent-cyan drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+            <span className="font-bold text-sm text-white">{totalPoints}</span>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Daily Lesson Card */}
-      <Card elevated hoverable className="relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-indigo/20 to-accent-purple/20 opacity-50 transition-opacity group-hover:opacity-100" />
-        <CardContent className="relative z-10 flex flex-col items-center text-center p-8">
-          <div className="w-16 h-16 rounded-full bg-accent-indigo/20 flex items-center justify-center mb-4 text-3xl">
-            📚
-          </div>
-          <h2 className="text-2xl font-bold font-cairo mb-2">درس اليوم</h2>
-          <p className="text-text-secondary mb-6 text-sm max-w-[250px]">
-            حان الوقت لاسترجاع بعض المعلومات الهامة وتحدي ذاكرتك.
-          </p>
+      <motion.div variants={itemVariants}>
+        <Card elevated hoverable className="relative overflow-hidden group border-0 p-[1px]">
+          {/* Animated gradient border wrapper */}
+          <div className="absolute inset-0 bg-gradient-to-br from-accent-indigo via-accent-purple to-accent-cyan opacity-40 group-hover:opacity-100 transition-opacity duration-500" />
           
-          <Link to="/flashcards" className="btn-primary w-full flex items-center justify-center gap-2">
-            <span>ابدأ المراجعة</span>
-            <Play size={18} className="fill-current" />
-          </Link>
-        </CardContent>
-      </Card>
+          <div className="relative h-full bg-bg-card/90 backdrop-blur-2xl rounded-[15px] z-10 overflow-hidden">
+            {/* Inner decorative light */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-accent-indigo/30 blur-[40px] rounded-full mix-blend-screen" />
+            
+            <CardContent className="relative z-10 flex flex-col items-start p-8">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-indigo to-accent-purple flex items-center justify-center mb-6 shadow-glow-indigo">
+                <BookOpen size={24} className="text-white" />
+              </div>
+              
+              <h2 className="text-3xl font-extrabold font-cairo mb-2 text-white">درس اليوم</h2>
+              <p className="text-text-secondary mb-8 text-sm font-medium leading-relaxed max-w-[80%]">
+                استرجع أهم المعلومات الطبية واصقل مهاراتك الدوائية بأسلوب تفاعلي سريع.
+              </p>
+              
+              <Link to="/flashcards" className="btn-primary w-full flex items-center justify-center gap-3">
+                <span className="text-lg">ابدأ المراجعة</span>
+                <Play size={20} className="fill-current" />
+              </Link>
+            </CardContent>
+          </div>
+        </Card>
+      </motion.div>
 
       {/* Quick Stats / Motivation */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="p-4 flex flex-col items-center justify-center text-center">
-          <ProgressRing percentage={state.completedCards.length > 0 ? 5 : 0} size={80} strokeWidth={6} color="#10B981">
-            <span className="font-bold text-lg">{state.completedCards.length}</span>
+      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-5">
+        <Card hoverable className="p-6 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+          <div className="absolute -inset-2 bg-gradient-to-tr from-accent-emerald/0 via-accent-emerald/5 to-accent-emerald/0 group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
+          
+          <ProgressRing 
+            percentage={state.completedCards.length > 0 ? Math.min(state.completedCards.length, 100) : 0} 
+            size={90} 
+            strokeWidth={8} 
+            color="#10B981"
+          >
+            <div className="flex flex-col items-center">
+              <span className="font-extrabold text-2xl text-white">{state.completedCards.length}</span>
+            </div>
           </ProgressRing>
-          <span className="mt-2 text-sm text-text-secondary font-semibold">بطاقة منجزة</span>
+          <div className="mt-4 flex items-center gap-1.5 text-text-secondary">
+            <Award size={16} className="text-accent-emerald" />
+            <span className="text-sm font-bold">بطاقة منجزة</span>
+          </div>
         </Card>
         
-        <Card className="p-4 flex flex-col items-center justify-center text-center">
-          <div className="text-3xl mb-2">🔥</div>
-          <h3 className="font-bold text-xl">{state.userStats.longestStreak}</h3>
-          <span className="text-sm text-text-secondary font-semibold">أطول سلسلة</span>
+        <Card hoverable className="p-6 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-accent-amber/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="w-20 h-20 rounded-full bg-bg-elevated border border-white/5 shadow-inner flex items-center justify-center mb-2 relative">
+             <div className="absolute inset-0 rounded-full bg-accent-amber/10 blur-md animate-pulse-slow" />
+             <Zap size={32} className="text-accent-amber drop-shadow-[0_0_12px_rgba(245,158,11,0.5)] relative z-10" />
+          </div>
+          <h3 className="font-extrabold text-3xl text-white mt-2">{longestStreak}</h3>
+          <span className="text-sm text-text-secondary font-bold mt-1">أطول سلسلة أيام</span>
         </Card>
-      </div>
+      </motion.div>
       
       {/* Continue Journey */}
-      <div className="flex items-center justify-between mt-4">
-        <h3 className="font-bold font-cairo text-lg">أكمل رحلتك</h3>
-        <Link to="/levels" className="text-accent-cyan text-sm flex items-center hover:underline">
-          عرض الخريطة <ChevronLeft size={16} />
+      <motion.div variants={itemVariants} className="flex items-center justify-between mt-2 px-2">
+        <h3 className="font-extrabold font-cairo text-xl text-white">خريطتك العلمية</h3>
+        <Link to="/levels" className="glass-premium px-4 py-2 rounded-xl text-accent-cyan text-sm font-bold flex items-center gap-2 hover:bg-white/5 transition-colors">
+          عرض الرحلة <ChevronLeft size={16} />
         </Link>
-      </div>
-    </div>
+      </motion.div>
+      
+    </motion.div>
   );
 }

@@ -5,16 +5,17 @@ import { cn } from '../../lib/utils';
 const Card = forwardRef(({ className, children, elevated, hoverable, ...props }, ref) => {
   const CardComponent = hoverable ? motion.div : 'div';
   const hoverProps = hoverable ? {
-    whileHover: { y: -4, scale: 1.01 },
-    transition: { type: 'spring', stiffness: 300, damping: 20 }
+    whileHover: { y: -6, scale: 1.02 },
+    whileTap: { scale: 0.98 },
+    transition: { type: 'spring', stiffness: 400, damping: 25 }
   } : {};
 
   return (
     <CardComponent
       ref={ref}
       className={cn(
-        elevated ? 'glass-elevated' : 'glass-card',
-        hoverable && 'cursor-pointer hover:border-white/20 hover:shadow-2xl transition-all',
+        elevated ? 'glass-premium' : 'glass-card',
+        hoverable && 'cursor-pointer hover:border-white/20 hover:shadow-2xl transition-all duration-300',
         className
       )}
       {...hoverProps}
