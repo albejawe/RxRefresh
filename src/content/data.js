@@ -9,6 +9,7 @@ import { drugs as gi } from './drugs_gi';
 import { drugs as endocrine } from './drugs_endocrine';
 import { drugs as womensHealth } from './drugs_womens_health';
 import { drugs as ophthalmology } from './drugs_ophthalmology';
+import { drugs as emergency } from './drugs_emergency';
 
 import { diseases as importedDiseases } from './diseasesData';
 import { diseases as extraDiseases } from './diseases_extra';
@@ -46,7 +47,8 @@ export const drugs = [
   ...gi,
   ...endocrine,
   ...womensHealth,
-  ...ophthalmology
+  ...ophthalmology,
+  ...emergency
 ];
 export const diseases = [...importedDiseases, ...extraDiseases];
 export const quickFacts = importedQuickFacts;
