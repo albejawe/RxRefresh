@@ -1,4 +1,8 @@
 import { drugs as importedDrugs } from './drugsData';
+import { drugs as antibiotics } from './drugs_antibiotics';
+import { drugs as respiratory } from './drugs_respiratory';
+import { drugs as cns } from './drugs_cns';
+
 import { diseases as importedDiseases } from './diseasesData';
 import { quickFacts as importedQuickFacts } from './quickFactsData';
 
@@ -23,7 +27,7 @@ export const SPECIALTIES = [
   { id: 'oncology_basic', name: 'Oncology Basics (Common Drugs)',   nameAr: 'أساسيات الأورام (الأدوية الشائعة)', color: '#7C3AED', icon: '🎗️' }
 ];
 
-export const drugs = importedDrugs;
+export const drugs = [...importedDrugs, ...antibiotics, ...respiratory, ...cns];
 export const diseases = importedDiseases;
 export const quickFacts = importedQuickFacts;
 
