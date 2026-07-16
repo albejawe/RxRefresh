@@ -10,6 +10,8 @@ import { drugs as endocrine } from './drugs_endocrine';
 import { drugs as womensHealth } from './drugs_womens_health';
 import { drugs as ophthalmology } from './drugs_ophthalmology';
 import { drugs as emergency } from './drugs_emergency';
+import { drugs as msk } from './drugs_msk';
+import { drugs as allergy } from './drugs_allergy';
 
 import { diseases as importedDiseases } from './diseasesData';
 import { diseases as extraDiseases } from './diseases_extra';
@@ -48,7 +50,9 @@ export const drugs = [
   ...endocrine,
   ...womensHealth,
   ...ophthalmology,
-  ...emergency
+  ...emergency,
+  ...msk,
+  ...allergy
 ];
 export const diseases = [...importedDiseases, ...extraDiseases];
 export const quickFacts = importedQuickFacts;
