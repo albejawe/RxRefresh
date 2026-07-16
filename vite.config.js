@@ -8,9 +8,16 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
+      },
       injectRegister: 'auto',
-      filename: 'service-worker.js',
+      filename: 'sw.js',
       srcDir: 'public',
+      injectManifest: {
+        swSrc: 'public/service-worker.js',
+        swDest: 'dist/service-worker.js'
+      },
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'masked-icon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
         name: 'RxRefresh',
