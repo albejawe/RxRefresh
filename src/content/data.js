@@ -26,6 +26,7 @@ import { drugs as extraDrugs11, diseases as extraDiseases12 } from './drugs_extr
 import { drugs as extraDrugs12, diseases as extraDiseases13 } from './drugs_extra12';
 import { drugs as extraDrugs13, diseases as extraDiseases14 } from './drugs_extra13';
 import { drugs as extraDrugs14, diseases as extraDiseases15 } from './drugs_extra14';
+import { drugs as extraDrugs15, diseases as extraDiseases16 } from './drugs_extra15';
 
 import { diseases as importedDiseases } from './diseasesData';
 import { diseases as extraDiseases } from './diseases_extra';
@@ -87,9 +88,10 @@ export const drugs = [
   ...extraDrugs11,
   ...extraDrugs12,
   ...extraDrugs13,
-  ...extraDrugs14
+  ...extraDrugs14,
+  ...extraDrugs15
 ];
-export const diseases = [...importedDiseases, ...extraDiseases, ...extraDiseases2, ...extraDiseases3, ...extraDiseases4, ...extraDiseases5, ...extraDiseases6, ...extraDiseases7, ...extraDiseases8, ...extraDiseases9, ...extraDiseases10, ...extraDiseases11, ...extraDiseases12, ...extraDiseases13, ...extraDiseases14, ...extraDiseases15];
+export const diseases = [...importedDiseases, ...extraDiseases, ...extraDiseases2, ...extraDiseases3, ...extraDiseases4, ...extraDiseases5, ...extraDiseases6, ...extraDiseases7, ...extraDiseases8, ...extraDiseases9, ...extraDiseases10, ...extraDiseases11, ...extraDiseases12, ...extraDiseases13, ...extraDiseases14, ...extraDiseases15, ...extraDiseases16];
 export const quickFacts = importedQuickFacts;
 
 export const getSpecialtyById = (id) => SPECIALTIES.find(s => s.id === id);
