@@ -11,11 +11,19 @@ export default function Home() {
   const { streak, totalPoints, longestStreak } = state.userStats;
 
   const [showPermissionBanner, setShowPermissionBanner] = useState(false);
+  const [showIOSPrompt, setShowIOSPrompt] = useState(false);
 
   useEffect(() => {
     // Check if permission is not yet granted/denied, or if user is on iOS Safari
     if ('Notification' in window) {
       setShowPermissionBanner(Notification.permission === 'default');
+    } else {
+      // If Notification is not in window, it might be iOS Safari outside PWA mode
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      if (isIOS && !isStandalone) {
+        setShowIOSPrompt(true);
+      }
     }
   }, []);
 
@@ -109,6 +117,28 @@ export default function Home() {
                 >
                   تفعيل الآن
                 </button>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* iOS Safari Add to Home Screen / Install Banner */}
+      {showIOSPrompt && (
+        <motion.div variants={itemVariants} className="relative z-20">
+          <Card className="border border-accent-indigo/30 p-5 relative overflow-hidden bg-gradient-to-r from-accent-indigo/10 to-transparent">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-accent-indigo/20 flex items-center justify-center shrink-0">
+                <Bell className="text-accent-indigo animate-pulse" size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-extrabold text-white text-base font-cairo mb-1">تثبيت التطبيق وتفعيل الإشعارات</h3>
+                <p className="text-sm text-text-secondary leading-relaxed mb-3">
+                  لتفعيل الإشعارات على الآيفون، يرجى الضغط على زر المشاركة <span className="text-accent-indigo font-bold">"Share" 📤</span> ثم اختيار <span className="text-accent-indigo font-bold">"إضافة إلى الشاشة الرئيسية" 📲</span> لتثبيت التطبيق وفتحه من شاشتك الرئيسية.
+                </p>
+                <div className="text-xs font-bold text-text-muted">
+                  ⚠️ الإشعارات على الآيفون مدعومة فقط في وضع التطبيق المثبّت (PWA).
+                </div>
               </div>
             </div>
           </Card>
