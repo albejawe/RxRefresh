@@ -62,7 +62,7 @@ const BottomNavigation = () => {
   if (location.pathname.startsWith('/quiz') || location.pathname.startsWith('/card')) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm rounded-full glass-premium px-2 py-2 shadow-glass border border-white/10">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm rounded-full glass-premium px-2 py-2 shadow-glass">
       <div className="flex justify-around items-center relative">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -72,7 +72,7 @@ const BottomNavigation = () => {
               <Icon
                 size={22}
                 strokeWidth={isActive ? 2.5 : 2}
-                className={`transition-colors duration-300 relative z-10 ${isActive ? 'text-white drop-shadow-md' : 'text-text-muted hover:text-white/80'}`}
+                className={`transition-colors duration-300 relative z-10 ${isActive ? 'text-white drop-shadow-md' : 'text-text-muted hover:text-text-primary'}`}
               />
               {isActive && (
                 <motion.div

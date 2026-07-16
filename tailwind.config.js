@@ -9,20 +9,24 @@ export default {
     extend: {
       colors: {
         bg: { 
-          primary: '#030712', // Much darker, deep space
-          secondary: '#0F172A', 
-          card: '#111827', 
-          elevated: '#1E293B',
-          glow: '#0B132B'
+          primary: 'rgb(var(--bg-primary-rgb) / <alpha-value>)', 
+          secondary: 'rgb(var(--bg-secondary-rgb) / <alpha-value>)', 
+          card: 'rgb(var(--bg-card-rgb) / <alpha-value>)', 
+          elevated: 'rgb(var(--bg-elevated-rgb) / <alpha-value>)',
+          glow: 'rgb(var(--bg-primary-rgb) / <alpha-value>)'
         },
         accent: {
           indigo: '#6366F1', purple: '#A855F7', cyan: '#06B6D4',
           green: '#10B981', red: '#F43F5E', amber: '#F59E0B', pink: '#EC4899',
           emerald: '#059669', turquoise: '#14B8A6'
         },
-        text: { primary: '#F8FAFC', secondary: '#94A3B8', muted: '#475569' },
+        text: { 
+          primary: 'var(--text-primary)', 
+          secondary: 'var(--text-secondary)', 
+          muted: 'var(--text-muted)' 
+        },
         gradient: {
-          start: 'rgba(255, 255, 255, 0.05)',
+          start: 'var(--border-color)',
           end: 'rgba(255, 255, 255, 0.01)'
         }
       },

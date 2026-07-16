@@ -15,6 +15,7 @@ const initialState = {
   settings: {
     notificationTimes: ['21:00'], // Array of times (HH:mm)
     sentNotificationIds: [], // Track sent drug/disease IDs to prevent repetition
+    theme: 'dark', // 'dark' or 'light'
   }
 };
 
@@ -36,7 +37,7 @@ function init(initialData) {
         }
       }
       
-      // Migrate settings for multiple notifications
+      // Migrate settings for multiple notifications and theme
       if (parsed.settings) {
         if (!parsed.settings.notificationTimes) {
           parsed.settings.notificationTimes = [parsed.settings.notificationTime || '21:00'];
@@ -45,10 +46,14 @@ function init(initialData) {
         if (!parsed.settings.sentNotificationIds) {
           parsed.settings.sentNotificationIds = [];
         }
+        if (!parsed.settings.theme) {
+          parsed.settings.theme = 'dark';
+        }
       } else {
         parsed.settings = {
           notificationTimes: ['21:00'],
           sentNotificationIds: [],
+          theme: 'dark',
         };
       }
       
@@ -153,6 +158,17 @@ function reducer(state, action) {
       };
       break;
     }
+    case 'TOGGLE_THEME': {
+      const nextTheme = state.settings.theme === 'light' ? 'dark' : 'light';
+      newState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          theme: nextTheme
+        }
+      };
+      break;
+    }
     default:
       return state;
   }
@@ -167,6 +183,15 @@ export function AppProvider({ children }) {
   useEffect(() => {
     dispatch({ type: 'MARK_ACTIVE_TODAY' });
   }, []);
+
+  useEffect(() => {
+    const currentTheme = state.settings.theme || 'dark';
+    if (currentTheme === 'light') {
+      document.body.classList.add('light');
+    } else {
+      document.body.classList.remove('light');
+    }
+  }, [state.settings.theme]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

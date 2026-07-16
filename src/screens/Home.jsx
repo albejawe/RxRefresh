@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Star, ChevronLeft, Play, Award, Zap, BookOpen, Bell } from 'lucide-react';
+import { Flame, Star, ChevronLeft, Play, Award, Zap, BookOpen, Bell, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext';
 import { Card, CardContent } from '../components/ui/Card';
 import { ProgressRing } from '../components/ui/ProgressRing';
 
 export default function Home() {
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const { streak, totalPoints, longestStreak } = state.userStats;
 
   const [showPermissionBanner, setShowPermissionBanner] = useState(false);
@@ -77,23 +77,37 @@ export default function Home() {
       {/* Header section */}
       <motion.header variants={itemVariants} className="flex justify-between items-center py-2 relative z-10">
         <div>
-          <h1 className="text-3xl font-extrabold font-cairo text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-3xl font-extrabold font-cairo text-text-primary tracking-tight flex items-center gap-2">
             مرحباً بك! <span className="text-accent-cyan inline-block animate-float">✨</span>
           </h1>
           <p className="text-text-secondary mt-1 font-medium text-sm">مستعد لرحلة اليوم العلمية?</p>
         </div>
         
-        <div className="flex gap-3">
-          <div className="flex items-center gap-1.5 glass-premium px-4 py-2 rounded-2xl relative overflow-hidden group cursor-default">
+        <div className="flex gap-2">
+          <button 
+            onClick={() => dispatch({ type: 'TOGGLE_THEME' })}
+            className="flex items-center justify-center w-11 h-11 glass-premium rounded-2xl relative overflow-hidden group cursor-pointer"
+            title="تبديل المظهر"
+          >
+            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors" />
+            {state.settings.theme === 'light' ? (
+              <Moon size={18} className="text-accent-purple drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] relative z-10" />
+            ) : (
+              <Sun size={18} className="text-accent-amber drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] relative z-10" />
+            )}
+          </button>
+
+          <div className="flex items-center gap-1.5 glass-premium px-3.5 py-2 rounded-2xl relative overflow-hidden group cursor-default">
             {/* Inner shimmer on hover */}
             <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors" />
             <Flame size={18} className={streak > 0 ? 'text-accent-amber drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]' : 'text-text-muted'} />
-            <span className="font-bold text-sm text-white">{streak}</span>
+            <span className="font-bold text-sm text-text-primary">{streak}</span>
           </div>
-          <div className="flex items-center gap-1.5 glass-premium px-4 py-2 rounded-2xl relative overflow-hidden group cursor-default">
+          
+          <div className="flex items-center gap-1.5 glass-premium px-3.5 py-2 rounded-2xl relative overflow-hidden group cursor-default">
             <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors" />
             <Star size={18} className="text-accent-cyan drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-            <span className="font-bold text-sm text-white">{totalPoints}</span>
+            <span className="font-bold text-sm text-text-primary">{totalPoints}</span>
           </div>
         </div>
       </motion.header>
@@ -107,7 +121,7 @@ export default function Home() {
                 <Bell className="text-accent-cyan animate-pulse" size={24} />
               </div>
               <div className="flex-1">
-                <h3 className="font-extrabold text-white text-base font-cairo mb-1">تفعيل التنبيهات اليومية</h3>
+                <h3 className="font-extrabold text-text-primary text-base font-cairo mb-1">تفعيل التنبيهات اليومية</h3>
                 <p className="text-sm text-text-secondary leading-relaxed mb-3">
                   احصل على التذكيرات والدروس والأسئلة مباشرة على شاشتك لتضمن مراجعة مستمرة.
                 </p>
@@ -132,7 +146,7 @@ export default function Home() {
                 <Bell className="text-accent-indigo animate-pulse" size={24} />
               </div>
               <div className="flex-1">
-                <h3 className="font-extrabold text-white text-base font-cairo mb-1">تثبيت التطبيق وتفعيل الإشعارات</h3>
+                <h3 className="font-extrabold text-text-primary text-base font-cairo mb-1">تثبيت التطبيق وتفعيل الإشعارات</h3>
                 <p className="text-sm text-text-secondary leading-relaxed mb-3">
                   لتفعيل الإشعارات على الآيفون، يرجى الضغط على زر المشاركة <span className="text-accent-indigo font-bold">"Share" 📤</span> ثم اختيار <span className="text-accent-indigo font-bold">"إضافة إلى الشاشة الرئيسية" 📲</span> لتثبيت التطبيق وفتحه من شاشتك الرئيسية.
                 </p>
@@ -160,7 +174,7 @@ export default function Home() {
                 <BookOpen size={24} className="text-white" />
               </div>
               
-              <h2 className="text-3xl font-extrabold font-cairo mb-2 text-white">درس اليوم</h2>
+              <h2 className="text-3xl font-extrabold font-cairo mb-2 text-text-primary">درس اليوم</h2>
               <p className="text-text-secondary mb-8 text-sm font-medium leading-relaxed max-w-[80%]">
                 استرجع أهم المعلومات الطبية واصقل مهاراتك الدوائية بأسلوب تفاعلي سريع.
               </p>
@@ -186,7 +200,7 @@ export default function Home() {
             color="#10B981"
           >
             <div className="flex flex-col items-center">
-              <span className="font-extrabold text-2xl text-white">{state.completedCards.length}</span>
+              <span className="font-extrabold text-2xl text-text-primary">{state.completedCards.length}</span>
             </div>
           </ProgressRing>
           <div className="mt-4 flex items-center gap-1.5 text-text-secondary">
@@ -201,15 +215,15 @@ export default function Home() {
              <div className="absolute inset-0 rounded-full bg-accent-amber/10 blur-md animate-pulse-slow" />
              <Zap size={32} className="text-accent-amber drop-shadow-[0_0_12px_rgba(245,158,11,0.5)] relative z-10" />
           </div>
-          <h3 className="font-extrabold text-3xl text-white mt-2">{longestStreak}</h3>
+          <h3 className="font-extrabold text-3xl text-text-primary mt-2">{longestStreak}</h3>
           <span className="text-sm text-text-secondary font-bold mt-1">أطول سلسلة أيام</span>
         </Card>
       </motion.div>
       
       {/* Continue Journey */}
       <motion.div variants={itemVariants} className="flex items-center justify-between mt-2 px-2">
-        <h3 className="font-extrabold font-cairo text-xl text-white">خريطتك العلمية</h3>
-        <Link to="/levels" className="glass-premium px-4 py-2 rounded-xl text-accent-cyan text-sm font-bold flex items-center gap-2 hover:bg-white/5 transition-colors">
+        <h3 className="font-extrabold font-cairo text-xl text-text-primary">خريطتك العلمية</h3>
+        <Link to="/levels" className="glass-premium px-4 py-2 rounded-xl text-accent-cyan text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-colors">
           عرض الرحلة <ChevronLeft size={16} />
         </Link>
       </motion.div>
