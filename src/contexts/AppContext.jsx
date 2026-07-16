@@ -13,7 +13,8 @@ const initialState = {
   srsQueue: {}, // { [cardId]: { nextReview: timestamp, step: number (0,1,2 for 1d, 3d, 7d) } }
   quizHistory: [], // { cardId, type, correct, timestamp }
   settings: {
-    notificationTime: '21:00', // 9 PM default
+    notificationTimes: ['21:00'], // Array of times (HH:mm)
+    sentNotificationIds: [], // Track sent drug/disease IDs to prevent repetition
   }
 };
 
@@ -34,6 +35,23 @@ function init(initialData) {
           parsed.userStats.streak = 0;
         }
       }
+      
+      // Migrate settings for multiple notifications
+      if (parsed.settings) {
+        if (!parsed.settings.notificationTimes) {
+          parsed.settings.notificationTimes = [parsed.settings.notificationTime || '21:00'];
+          delete parsed.settings.notificationTime;
+        }
+        if (!parsed.settings.sentNotificationIds) {
+          parsed.settings.sentNotificationIds = [];
+        }
+      } else {
+        parsed.settings = {
+          notificationTimes: ['21:00'],
+          sentNotificationIds: [],
+        };
+      }
+      
       return { ...initialData, ...parsed };
     }
   } catch (e) {
@@ -111,6 +129,28 @@ function reducer(state, action) {
     }
     case 'UPDATE_SETTINGS': {
       newState = { ...state, settings: { ...state.settings, ...action.payload } };
+      break;
+    }
+    case 'MARK_NOTIFICATION_SENT': {
+      const sentIds = state.settings.sentNotificationIds || [];
+      if (sentIds.includes(action.payload.id)) break;
+      newState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          sentNotificationIds: [...sentIds, action.payload.id]
+        }
+      };
+      break;
+    }
+    case 'RESET_SENT_NOTIFICATIONS': {
+      newState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          sentNotificationIds: []
+        }
+      };
       break;
     }
     default:

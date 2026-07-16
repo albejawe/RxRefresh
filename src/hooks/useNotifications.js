@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
+import { drugs, diseases } from '../content/data';
 
 export function useNotifications() {
-  const { state } = useAppContext();
-  const targetTime = state.settings.notificationTime || '21:00'; // HH:mm
+  const { state, dispatch } = useAppContext();
+  const notificationTimes = state.settings.notificationTimes || ['21:00'];
 
   useEffect(() => {
-    // Request permission if not granted
+    // Attempt permission request on load (mostly works on desktop, mobile needs user gesture)
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
@@ -32,47 +33,62 @@ export function useNotifications() {
         const now = new Date();
         const currentHour = now.getHours();
         const currentMinute = now.getMinutes();
-        
-        const [targetHour, targetMinute] = targetTime.split(':').map(Number);
-        
-        // Check if we already notified today
-        const lastNotified = localStorage.getItem('rxrefresh_last_notified');
         const today = now.toDateString();
-        
-        if (lastNotified !== today) {
-          // Check if exact time reached (or passed within 5 mins to avoid spam)
-          if (currentHour === targetHour && currentMinute >= targetMinute && currentMinute < targetMinute + 5) {
-            
-            // Store notification time for service worker
-            localStorage.setItem('rxrefresh_notification_time', targetTime);
-            
-            // Register Service Worker and use it to show notification (works better for PWA on Android)
-            navigator.serviceWorker.ready.then(registration => {
-              registration.showNotification('RxRefresh - درس اليوم', {
-                body: 'حان الوقت لاسترجاع معلوماتك وتحديث معرفتك الدوائية!',
-                icon: '/pwa-192x192.png',
-                badge: '/pwa-192x192.png',
-                vibrate: [200, 100, 200],
-                tag: 'daily-lesson',
-                requireInteraction: false,
-                actions: [
-                  {
-                    action: 'open',
-                    title: 'افتح التطبيق'
-                  }
-                ]
-              });
-            }).catch(() => {
-              // Fallback to normal Web Notification
-              new Notification('RxRefresh - درس اليوم', {
-                body: 'حان الوقت لاسترجاع معلوماتك وتحديث معرفتك الدوائية!',
-                icon: '/pwa-192x192.png'
-              });
-            });
 
-            localStorage.setItem('rxrefresh_last_notified', today);
+        notificationTimes.forEach(targetTime => {
+          const [targetHour, targetMinute] = targetTime.split(':').map(Number);
+          const lastNotifiedKey = `rxrefresh_last_notified_${targetTime}`;
+          const lastNotified = localStorage.getItem(lastNotifiedKey);
+
+          if (lastNotified !== today) {
+            // Check if exact time matches (within a 5-minute window to avoid missing it)
+            if (currentHour === targetHour && currentMinute >= targetMinute && currentMinute < targetMinute + 5) {
+              
+              // Get the next unsent item
+              const allItems = [...drugs, ...diseases];
+              const sentIds = state.settings.sentNotificationIds || [];
+              let unsentItems = allItems.filter(item => !sentIds.includes(item.id));
+
+              if (unsentItems.length === 0) {
+                unsentItems = allItems;
+                dispatch({ type: 'RESET_SENT_NOTIFICATIONS' });
+              }
+
+              // Select the first unsent item
+              const selectedItem = unsentItems[0];
+              if (!selectedItem) return;
+
+              // Format notification title and body
+              const title = `مراجعة RxRefresh: ${selectedItem.nameAr}`;
+              const body = selectedItem.mechanism?.tagline || selectedItem.overview || 'حان الوقت لمراجعة معلوماتك الدوائية اليوم!';
+              
+              // Trigger service worker notification for background compatibility
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(title, {
+                  body: body,
+                  icon: '/pwa-192x192.png',
+                  vibrate: [200, 100, 200],
+                  tag: `card-${selectedItem.id}`
+                });
+              }).catch(() => {
+                // Fallback to standard web notification
+                new Notification(title, {
+                  body: body,
+                  icon: '/pwa-192x192.png'
+                });
+              });
+
+              // Mark as notified for this time slot today
+              localStorage.setItem(lastNotifiedKey, today);
+              
+              // Mark the item as sent to prevent repetition
+              dispatch({
+                type: 'MARK_NOTIFICATION_SENT',
+                payload: { id: selectedItem.id }
+              });
+            }
           }
-        }
+        });
       }
     };
 
@@ -82,5 +98,5 @@ export function useNotifications() {
     checkAndNotify();
 
     return () => clearInterval(interval);
-  }, [targetTime]);
+  }, [notificationTimes, state.settings.sentNotificationIds, dispatch]);
 }
