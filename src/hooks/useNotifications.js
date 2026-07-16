@@ -11,6 +11,22 @@ export function useNotifications() {
       Notification.requestPermission();
     }
 
+    // Register Background Sync for reliable notifications
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then((registration) => {
+        // Schedule periodic sync for notifications
+        if ('periodicSync' in registration) {
+          registration.periodicSync.register('sync-notifications', {
+            minInterval: 24 * 60 * 60 * 1000 // 24 hours
+          }).catch((err) => {
+            console.log('Periodic sync registration failed:', err);
+          });
+        }
+      }).catch((err) => {
+        console.log('Service Worker registration failed for sync:', err);
+      });
+    }
+
     const checkAndNotify = () => {
       if ('Notification' in window && Notification.permission === 'granted') {
         const now = new Date();
@@ -27,13 +43,24 @@ export function useNotifications() {
           // Check if exact time reached (or passed within 5 mins to avoid spam)
           if (currentHour === targetHour && currentMinute >= targetMinute && currentMinute < targetMinute + 5) {
             
+            // Store notification time for service worker
+            localStorage.setItem('rxrefresh_notification_time', targetTime);
+            
             // Register Service Worker and use it to show notification (works better for PWA on Android)
             navigator.serviceWorker.ready.then(registration => {
               registration.showNotification('RxRefresh - درس اليوم', {
                 body: 'حان الوقت لاسترجاع معلوماتك وتحديث معرفتك الدوائية!',
                 icon: '/pwa-192x192.png',
+                badge: '/pwa-192x192.png',
                 vibrate: [200, 100, 200],
-                tag: 'daily-lesson'
+                tag: 'daily-lesson',
+                requireInteraction: false,
+                actions: [
+                  {
+                    action: 'open',
+                    title: 'افتح التطبيق'
+                  }
+                ]
               });
             }).catch(() => {
               // Fallback to normal Web Notification
