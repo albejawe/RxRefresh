@@ -5,10 +5,10 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary-rgb: 3, 7, 18;
-  --bg-secondary-rgb: 15, 23, 42;
-  --bg-card-rgb: 10, 14, 26;
-  --bg-elevated-rgb: 17, 24, 39;
+  --bg-primary-rgb: 3 7 18;
+  --bg-secondary-rgb: 15 23 42;
+  --bg-card-rgb: 10 14 26;
+  --bg-elevated-rgb: 17 24 39;
 
   --bg-primary: #030712;
   --bg-secondary: #0F172A;
@@ -29,10 +29,10 @@
 }
 
 .light {
-  --bg-primary-rgb: 243, 244, 246;
-  --bg-secondary-rgb: 229, 231, 235;
-  --bg-card-rgb: 255, 255, 255;
-  --bg-elevated-rgb: 249, 250, 251;
+  --bg-primary-rgb: 243 244 246;
+  --bg-secondary-rgb: 229 231 235;
+  --bg-card-rgb: 255 255 255;
+  --bg-elevated-rgb: 249 250 251;
 
   --bg-primary: #F3F4F6; /* Cool light gray */
   --bg-secondary: #E5E7EB;
