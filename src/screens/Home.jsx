@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Star, ChevronLeft, Play, Award, Zap, BookOpen } from 'lucide-react';
+import { Flame, Star, ChevronLeft, Play, Award, Zap, BookOpen, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext';
 import { Card, CardContent } from '../components/ui/Card';
@@ -8,6 +9,37 @@ import { ProgressRing } from '../components/ui/ProgressRing';
 export default function Home() {
   const { state } = useAppContext();
   const { streak, totalPoints, longestStreak } = state.userStats;
+
+  const [showPermissionBanner, setShowPermissionBanner] = useState(false);
+
+  useEffect(() => {
+    // Check if permission is not yet granted/denied, or if user is on iOS Safari
+    if ('Notification' in window) {
+      setShowPermissionBanner(Notification.permission === 'default');
+    }
+  }, []);
+
+  const handleRequestPermission = () => {
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        setShowPermissionBanner(false);
+        if (permission === 'granted') {
+          // Show a welcome notification
+          navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification('RxRefresh', {
+              body: '🎉 تم تفعيل الإشعارات بنجاح! ستصلك التنبيهات يومياً.',
+              icon: '/pwa-192x192.png'
+            });
+          }).catch(() => {
+            new Notification('RxRefresh', {
+              body: '🎉 تم تفعيل الإشعارات بنجاح! ستصلك التنبيهات يومياً.',
+              icon: '/pwa-192x192.png'
+            });
+          });
+        }
+      });
+    }
+  };
 
   // Stagger animation for children
   const containerVariants = {
@@ -40,7 +72,7 @@ export default function Home() {
           <h1 className="text-3xl font-extrabold font-cairo text-white tracking-tight flex items-center gap-2">
             مرحباً بك! <span className="text-accent-cyan inline-block animate-float">✨</span>
           </h1>
-          <p className="text-text-secondary mt-1 font-medium text-sm">مستعد لرحلة اليوم العلمية؟</p>
+          <p className="text-text-secondary mt-1 font-medium text-sm">مستعد لرحلة اليوم العلمية?</p>
         </div>
         
         <div className="flex gap-3">
@@ -57,6 +89,31 @@ export default function Home() {
           </div>
         </div>
       </motion.header>
+
+      {/* Notification Permission Banner */}
+      {showPermissionBanner && (
+        <motion.div variants={itemVariants} className="relative z-20">
+          <Card className="border border-accent-cyan/30 p-5 relative overflow-hidden bg-gradient-to-r from-accent-cyan/10 to-transparent">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-accent-cyan/20 flex items-center justify-center shrink-0">
+                <Bell className="text-accent-cyan animate-pulse" size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-extrabold text-white text-base font-cairo mb-1">تفعيل التنبيهات اليومية</h3>
+                <p className="text-sm text-text-secondary leading-relaxed mb-3">
+                  احصل على التذكيرات والدروس والأسئلة مباشرة على شاشتك لتضمن مراجعة مستمرة.
+                </p>
+                <button 
+                  onClick={handleRequestPermission}
+                  className="px-4 py-2 bg-accent-cyan text-bg-primary rounded-xl font-bold text-xs hover:bg-opacity-80 transition-colors shadow-glow-cyan"
+                >
+                  تفعيل الآن
+                </button>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Daily Lesson Card */}
       <motion.div variants={itemVariants}>

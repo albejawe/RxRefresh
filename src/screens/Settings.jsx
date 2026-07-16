@@ -10,15 +10,6 @@ export default function Settings() {
   const [time, setTime] = useState(state.settings.notificationTime || '21:00');
 
   const handleSave = () => {
-    // Validate time is between 21:00 (9PM) and 06:00 (6AM)
-    const [hours, minutes] = time.split(':').map(Number);
-    const isValidTime = (hours >= 21 && hours <= 23) || (hours >= 0 && hours <= 6);
-    
-    if (!isValidTime) {
-      addToast('يجب أن يكون الوقت بين 9 مساءً و 6 صباحاً', 'error');
-      return;
-    }
-
     dispatch({
       type: 'UPDATE_SETTINGS',
       payload: { notificationTime: time }
@@ -37,7 +28,7 @@ export default function Settings() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-text-secondary">
-            اختر وقتاً مناسباً لتلقي إشعار الدرس اليومي (النافذة المسموحة: 9 مساءً - 6 صباحاً).
+            اختر وقتاً مناسباً لتلقي إشعار الدرس اليومي.
           </p>
           
           <div className="flex items-center gap-4">
