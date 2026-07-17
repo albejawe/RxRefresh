@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useReducer } from 'react';
+import { drugs, diseases } from '../content/data';
 
 const AppContext = createContext();
 
@@ -169,11 +170,26 @@ function reducer(state, action) {
       };
       break;
     }
+    case 'SYNC_FROM_CACHE': {
+      newState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          sentNotificationIds: action.payload.settings.sentNotificationIds
+        }
+      };
+      break;
+    }
     default:
       return state;
   }
   
   localStorage.setItem('rxrefresh_data', JSON.stringify(newState));
+  if (typeof window !== 'undefined' && 'caches' in window) {
+    caches.open('rxrefresh-settings').then(cache => {
+      cache.put('/api/settings', new Response(JSON.stringify(newState)));
+    }).catch(err => console.log('Failed to save settings to cache:', err));
+  }
   return newState;
 }
 
@@ -183,6 +199,53 @@ export function AppProvider({ children }) {
   useEffect(() => {
     dispatch({ type: 'MARK_ACTIVE_TODAY' });
   }, []);
+
+  // Seed items and sync settings cache on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      // 1. Seed drugs and diseases list
+      caches.open('rxrefresh-settings').then(cache => {
+        const items = [...drugs, ...diseases].map(item => ({
+          id: item.id,
+          name: item.name,
+          nameAr: item.nameAr,
+          overview: item.overview,
+          tagline: item.mechanism?.tagline || item.overview || ''
+        }));
+        cache.put('/api/items', new Response(JSON.stringify(items)));
+      }).catch(err => console.log('Failed to seed items in cache:', err));
+
+      // 2. Initialize settings in cache if empty
+      caches.open('rxrefresh-settings').then(cache => {
+        cache.match('/api/settings').then(response => {
+          if (!response) {
+            cache.put('/api/settings', new Response(JSON.stringify(state)));
+          }
+        });
+      });
+    }
+  }, []);
+
+  // Sync settings from cache (updated by service worker while app was closed)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      caches.open('rxrefresh-settings').then(cache => {
+        cache.match('/api/settings').then(response => {
+          if (response) {
+            response.json().then(cachedState => {
+              if (cachedState && cachedState.settings && cachedState.settings.sentNotificationIds) {
+                const currentSentCount = state.settings.sentNotificationIds?.length || 0;
+                const cachedSentCount = cachedState.settings.sentNotificationIds.length;
+                if (cachedSentCount > currentSentCount) {
+                  dispatch({ type: 'SYNC_FROM_CACHE', payload: cachedState });
+                }
+              }
+            }).catch(() => {});
+          }
+        });
+      }).catch(() => {});
+    }
+  }, [state.settings.sentNotificationIds, dispatch]);
 
   useEffect(() => {
     const currentTheme = state.settings.theme || 'dark';

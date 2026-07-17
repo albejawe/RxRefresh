@@ -7,27 +7,92 @@ export function useNotifications() {
   const notificationTimes = state.settings.notificationTimes || ['21:00'];
 
   useEffect(() => {
-    // Attempt permission request on load (mostly works on desktop, mobile needs user gesture)
+    // 1. Request notification permission on mount
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
 
-    // Register Background Sync for reliable notifications
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    // 2. Register Background Sync and Periodic Sync
+    if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
-        // Schedule periodic sync for notifications
+        // Register periodic background sync
         if ('periodicSync' in registration) {
           registration.periodicSync.register('sync-notifications', {
-            minInterval: 24 * 60 * 60 * 1000 // 24 hours
+            minInterval: 60 * 60 * 1000 // Check every hour in the background if possible
           }).catch((err) => {
-            console.log('Periodic sync registration failed:', err);
+            console.log('SW: Periodic sync registration failed:', err);
+          });
+        }
+        
+        // Register standard background sync as well (fires when browser wakes up)
+        if ('sync' in registration) {
+          registration.sync.register('sync-notifications').catch((err) => {
+            console.log('SW: Background sync registration failed:', err);
           });
         }
       }).catch((err) => {
-        console.log('Service Worker registration failed for sync:', err);
+        console.log('SW: Service Worker ready check failed:', err);
       });
     }
 
+    // 3. Helper to schedule next notification using Notification Triggers (Chrome/Edge support)
+    const scheduleFutureTriggers = async () => {
+      if ('Notification' in window && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+        // Check if TimestampTrigger is supported
+        const supportsTriggers = 'showTrigger' in Notification.prototype || (typeof TimestampTrigger !== 'undefined');
+        if (!supportsTriggers) return;
+
+        const registration = await navigator.serviceWorker.ready;
+        const allItems = [...drugs, ...diseases];
+        const sentIds = state.settings.sentNotificationIds || [];
+        let unsentItems = allItems.filter(item => !sentIds.includes(item.id));
+        if (unsentItems.length === 0) {
+          unsentItems = allItems;
+        }
+
+        const selectedItem = unsentItems[0];
+        if (!selectedItem) return;
+
+        const title = `مراجعة RxRefresh: ${selectedItem.nameAr}`;
+        const body = selectedItem.mechanism?.tagline || selectedItem.overview || 'حان الوقت لمراجعة معلوماتك الدوائية اليوم!';
+
+        notificationTimes.forEach(targetTime => {
+          const [hours, minutes] = targetTime.split(':').map(Number);
+          const targetDate = new Date();
+          targetDate.setHours(hours, minutes, 0, 0);
+
+          // If target time already passed today, schedule for tomorrow
+          if (targetDate.getTime() <= Date.now()) {
+            targetDate.setDate(targetDate.getDate() + 1);
+          }
+
+          const targetTimestamp = targetDate.getTime();
+          const lastScheduledKey = `rxrefresh_last_scheduled_${targetTime}`;
+          const lastScheduled = localStorage.getItem(lastScheduledKey);
+
+          // Schedule if not already scheduled for this timestamp
+          if (lastScheduled !== targetTimestamp.toString()) {
+            try {
+              registration.showNotification(title, {
+                body: body,
+                icon: '/pwa-192x192.png',
+                vibrate: [200, 100, 200],
+                tag: `card-${selectedItem.id}`,
+                showTrigger: new TimestampTrigger(targetTimestamp)
+              });
+              localStorage.setItem(lastScheduledKey, targetTimestamp.toString());
+              console.log(`SW Trigger: Scheduled offline notification for ${targetTime} (${new Date(targetTimestamp).toLocaleString()})`);
+            } catch (e) {
+              console.error('SW Trigger: Failed to register TimestampTrigger:', e);
+            }
+          }
+        });
+      }
+    };
+
+    scheduleFutureTriggers();
+
+    // 4. Foreground timer checking (fires precisely on the minute when application is open)
     const checkAndNotify = () => {
       if ('Notification' in window && Notification.permission === 'granted') {
         const now = new Date();
@@ -41,10 +106,8 @@ export function useNotifications() {
           const lastNotified = localStorage.getItem(lastNotifiedKey);
 
           if (lastNotified !== today) {
-            // Check if exact time matches (within a 5-minute window to avoid missing it)
+            // Check if time matches (within a 5-minute window)
             if (currentHour === targetHour && currentMinute >= targetMinute && currentMinute < targetMinute + 5) {
-              
-              // Get the next unsent item
               const allItems = [...drugs, ...diseases];
               const sentIds = state.settings.sentNotificationIds || [];
               let unsentItems = allItems.filter(item => !sentIds.includes(item.id));
@@ -54,15 +117,12 @@ export function useNotifications() {
                 dispatch({ type: 'RESET_SENT_NOTIFICATIONS' });
               }
 
-              // Select the first unsent item
               const selectedItem = unsentItems[0];
               if (!selectedItem) return;
 
-              // Format notification title and body
               const title = `مراجعة RxRefresh: ${selectedItem.nameAr}`;
               const body = selectedItem.mechanism?.tagline || selectedItem.overview || 'حان الوقت لمراجعة معلوماتك الدوائية اليوم!';
               
-              // Trigger service worker notification for background compatibility
               navigator.serviceWorker.ready.then(registration => {
                 registration.showNotification(title, {
                   body: body,
@@ -71,31 +131,42 @@ export function useNotifications() {
                   tag: `card-${selectedItem.id}`
                 });
               }).catch(() => {
-                // Fallback to standard web notification
+                // Fallback to standard web notification if SW not ready
                 new Notification(title, {
                   body: body,
                   icon: '/pwa-192x192.png'
                 });
               });
 
-              // Mark as notified for this time slot today
+              // Save last notified date
               localStorage.setItem(lastNotifiedKey, today);
               
-              // Mark the item as sent to prevent repetition
+              // Mark item as sent
               dispatch({
                 type: 'MARK_NOTIFICATION_SENT',
                 payload: { id: selectedItem.id }
               });
+
+              // Save last notified to Cache for SW sync
+              if ('caches' in window) {
+                caches.open('rxrefresh-settings').then(cache => {
+                  const lastNotifiedDates = {};
+                  notificationTimes.forEach(t => {
+                    const val = localStorage.getItem(`rxrefresh_last_notified_${t}`);
+                    if (val) lastNotifiedDates[t] = val;
+                  });
+                  cache.put('/api/last-notified', new Response(JSON.stringify(lastNotifiedDates)));
+                });
+              }
             }
           }
         });
       }
     };
 
-    // Check every minute
-    const interval = setInterval(checkAndNotify, 60000);
-    // Also check immediately on mount
+    // Check immediately and then every minute
     checkAndNotify();
+    const interval = setInterval(checkAndNotify, 60000);
 
     return () => clearInterval(interval);
   }, [notificationTimes, state.settings.sentNotificationIds, dispatch]);

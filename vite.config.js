@@ -11,6 +11,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         navigateFallback: '/index.html',
+        importScripts: ['/sw-custom.js'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
