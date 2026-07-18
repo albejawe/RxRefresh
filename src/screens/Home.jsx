@@ -3,12 +3,15 @@ import { motion } from 'framer-motion';
 import { Flame, Star, ChevronLeft, Play, Award, Zap, BookOpen, Bell, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext';
+import { drugs, diseases } from '../content/data';
 import { Card, CardContent } from '../components/ui/Card';
 import { ProgressRing } from '../components/ui/ProgressRing';
 
 export default function Home() {
   const { state, dispatch } = useAppContext();
   const { streak, totalPoints, longestStreak } = state.userStats;
+  const totalCardsCount = drugs.length + diseases.length;
+  const progressPercent = totalCardsCount ? Math.round((state.completedCards.length / totalCardsCount) * 100) : 0;
 
   const [showPermissionBanner, setShowPermissionBanner] = useState(false);
   const [showIOSPrompt, setShowIOSPrompt] = useState(false);
@@ -194,7 +197,7 @@ export default function Home() {
           <div className="absolute -inset-2 bg-gradient-to-tr from-accent-emerald/0 via-accent-emerald/5 to-accent-emerald/0 group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
           
           <ProgressRing 
-            percentage={state.completedCards.length > 0 ? Math.min(state.completedCards.length, 100) : 0} 
+            percentage={progressPercent} 
             size={90} 
             strokeWidth={8} 
             color="#10B981"

@@ -1,14 +1,38 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, Lock, MapPin } from 'lucide-react';
-import { SPECIALTIES } from '../content/data';
+import { SPECIALTIES, drugs, diseases } from '../content/data';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function LevelsMap() {
   const { state } = useAppContext();
-  // For demo purposes, let's assume the first 3 are completed, 4th is active, rest are locked.
-  // In a real app, this would be computed from user progress.
-  const activeLevelIndex = 3; 
+  
+  // Compute active level index dynamically based on user progress in state.completedCards
+  let activeLevelIndex = 0;
+  for (let i = 0; i < SPECIALTIES.length; i++) {
+    const specId = SPECIALTIES[i].id;
+    const specDrugs = drugs.filter(d => d.specialty === specId);
+    const specDiseases = diseases.filter(d => d.specialty === specId);
+    const totalItems = specDrugs.length + specDiseases.length;
+    
+    if (totalItems === 0) {
+      activeLevelIndex = i;
+      break;
+    }
+    
+    const completedCount = [...specDrugs, ...specDiseases].filter(item => 
+      state.completedCards.includes(item.id)
+    ).length;
+    
+    if (completedCount < totalItems) {
+      activeLevelIndex = i;
+      break;
+    }
+    
+    if (i === SPECIALTIES.length - 1) {
+      activeLevelIndex = SPECIALTIES.length - 1;
+    }
+  }
 
   return (
     <div className="flex flex-col items-center w-full pb-24 relative overflow-hidden min-h-screen">
@@ -32,9 +56,18 @@ export default function LevelsMap() {
       <div className="relative w-full max-w-md mx-auto flex flex-col items-center pb-20">
         
         {SPECIALTIES.map((specialty, index) => {
+          const specDrugs = drugs.filter(d => d.specialty === specialty.id);
+          const specDiseases = diseases.filter(d => d.specialty === specialty.id);
+          const totalItems = specDrugs.length + specDiseases.length;
+          const completedCount = [...specDrugs, ...specDiseases].filter(item => 
+            state.completedCards.includes(item.id)
+          ).length;
+          
+          const isLevelFullyCompleted = totalItems > 0 && completedCount === totalItems;
+          
           const isLeft = index % 2 === 0;
-          const isCompleted = index < activeLevelIndex;
-          const isActive = index === activeLevelIndex;
+          const isCompleted = index < activeLevelIndex || isLevelFullyCompleted;
+          const isActive = index === activeLevelIndex && !isLevelFullyCompleted;
           const isLocked = index > activeLevelIndex;
           
           const hasNext = index < SPECIALTIES.length - 1;

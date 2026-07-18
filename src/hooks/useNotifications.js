@@ -170,4 +170,18 @@ export function useNotifications() {
 
     return () => clearInterval(interval);
   }, [notificationTimes, state.settings.sentNotificationIds, dispatch]);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      const handleServiceWorkerMessage = (event) => {
+        if (event.data && event.data.type === 'NAVIGATE_TO_CARD') {
+          window.location.hash = `#/card/${event.data.cardId}`;
+        }
+      };
+      navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+      return () => {
+        navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+      };
+    }
+  }, []);
 }

@@ -13,11 +13,11 @@ self.addEventListener('notificationclick', (event) => {
     
     event.waitUntil(
       self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-        // If the app is already open, navigate it to the card details page and focus it
+        // If the app is already open, focus it and post a message to update hash programmatically
         for (let i = 0; i < windowClients.length; i++) {
           const client = windowClients[i];
-          if ('focus' in client && 'navigate' in client) {
-            client.navigate(urlToOpen);
+          if ('focus' in client) {
+            client.postMessage({ type: 'NAVIGATE_TO_CARD', cardId: id });
             return client.focus();
           }
         }
