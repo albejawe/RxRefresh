@@ -12,6 +12,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         navigateFallback: '/index.html',
         importScripts: ['/sw-custom.js'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
